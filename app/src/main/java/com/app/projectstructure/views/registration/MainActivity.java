@@ -27,9 +27,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        FBLoginFragment mFbFragment=(FBLoginFragment)getSupportFragmentManager().
-                findFragmentById(R.id.facebook_login_fragment);
-        mFbFragment.showToastMessage();
         generateHashKey();
     }
 

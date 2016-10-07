@@ -4,14 +4,19 @@ import android.content.Context;
 import android.util.Log;
 
 import com.app.projectstructure.model.FeaturedModel;
+import com.app.projectstructure.model.ResponseModel;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 
 import okhttp3.Credentials;
 import okhttp3.Interceptor;
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
+import okhttp3.RequestBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -20,7 +25,8 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 
 public class NetworkCallbackClient {
-    public static final String BASE_URL                    = "http://www.rekommendus.com/dawer/index.php/";
+    //    public static final String BASE_URL                    = "http://www.rekommendus.com/dawer/index.php/";
+    public static final String BASE_URL                    = "http://www.rekommendus.com/dawer/index.php/app/";
     public static final String TAG_FEATURED_API            = "featured_api";
     public static final String TAG_NEARBY_API              = "nearby_api";
     public static final String TAG_COPY_COUPON_API         = "copy_coupon_api";
@@ -40,6 +46,15 @@ public class NetworkCallbackClient {
         this.context = context;
         request_type = type;
         initRetrofitClient();
+    }
+
+    public void initRetrofitClient() {
+        // Set the custom client when building adapter
+        retrofit = new Retrofit.Builder()
+                .baseUrl(BASE_URL)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+        apiService = retrofit.create(ApiInterface.class);
     }
 
     public void initRetrofitBasicAuth() {
@@ -75,14 +90,37 @@ public class NetworkCallbackClient {
 
     }
 
-    public void initRetrofitClient() {
-        // Set the custom client when building adapter
-        retrofit = new Retrofit.Builder()
-                .baseUrl(BASE_URL)
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
-        apiService = retrofit.create(ApiInterface.class);
+    public void uploadImageAPI(String path) {
+
+        File file = new File(path);
+
+        RequestBody        reqFile   = RequestBody.create(MediaType.parse("image/*"), file);
+        MultipartBody.Part body      = MultipartBody.Part.createFormData("profilepic", file.getName(), reqFile);
+        RequestBody        token     = RequestBody.create(MediaType.parse("text/plain"), "a152e84173914146e4bc4f391sd0f686ebc4f31");
+        RequestBody        is_social = RequestBody.create(MediaType.parse("text/plain"), "0");
+        RequestBody        firstname = RequestBody.create(MediaType.parse("text/plain"), "Rohit");
+        RequestBody        lastname  = RequestBody.create(MediaType.parse("text/plain"), "Jain");
+        RequestBody        password  = RequestBody.create(MediaType.parse("text/plain"), "123456");
+        RequestBody        email     = RequestBody.create(MediaType.parse("text/plain"), "email@gmail.com");
+        RequestBody        username  = RequestBody.create(MediaType.parse("text/plain"), "rohit@gmail.com");
+
+
+        Call<ResponseModel> call = apiService.upload(body, token, is_social, firstname, lastname, password, email, username);
+        call.enqueue(new Callback<ResponseModel>() {
+            @Override
+            public void onResponse(Call<ResponseModel> call, Response<ResponseModel> response) {
+                caller.onResponse(response.body(), request_type, true, response.code());
+            }
+
+            @Override
+            public void onFailure(Call<ResponseModel> call, Throwable t) {
+                caller.onResponse("", request_type, true, 500);
+            }
+        });
+
+
     }
+
 
     public void callFeaturedAPI(HashMap<String, String> params) {
         Call<FeaturedModel> call = apiService.featuredCouponList(params);
