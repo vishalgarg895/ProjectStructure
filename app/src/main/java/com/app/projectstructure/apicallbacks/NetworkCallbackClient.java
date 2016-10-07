@@ -25,7 +25,9 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 
 public class NetworkCallbackClient {
-    //    public static final String BASE_URL                    = "http://www.rekommendus.com/dawer/index.php/";
+
+    //public static final String BASE_URL                  = "http://www.rekommendus.com/dawer/index.php/";
+    /*this url is use to test multipart image uploading using retrofit.*/
     public static final String BASE_URL                    = "http://www.rekommendus.com/dawer/index.php/app/";
     public static final String TAG_FEATURED_API            = "featured_api";
     public static final String TAG_NEARBY_API              = "nearby_api";
